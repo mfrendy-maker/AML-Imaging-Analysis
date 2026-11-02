@@ -13,11 +13,13 @@ dependencies = [
   "numpy>=1.24",
   "pandas>=2.0",
   "requests>=2.31",
-  "scikit-learn>=1.4"
+  "scikit-learn>=1.4",
+  "Pillow>=10.0"
 ]
 
 [project.scripts]
 aml-imaging = "aml_imaging_analysis.cli:main"
+aml-ct-demo = "aml_imaging_analysis.ct_upload_demo:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

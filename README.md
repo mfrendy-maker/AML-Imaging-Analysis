@@ -39,6 +39,26 @@ python -m pip install -e .
 aml-imaging --help
 ```
 
+## CT upload demo for any CT sample input
+
+This repository includes a local browser-based CT upload demo that accepts any CT image file or CT-derived image from a user’s machine. It is designed for demonstration and exploratory analysis, not for clinical diagnosis.
+
+```bash
+python -m pip install -e .
+aml-ct-demo
+```
+
+Then open the browser at:
+
+- http://127.0.0.1:8003/upload
+
+The page accepts a CT file from the local machine and returns a result page showing:
+
+- the original CT image
+- a red intensity-based suspicious overlay
+- summary statistics such as mean intensity, standard deviation, and lesion proxy score
+- a short interpretation note stating that this is a demo-only image heuristic
+
 ## Collection
 
 The project currently targets the public Cancer Moonshot Biobank – Acute Myeloid Leukemia (CMB-AML) collection available on TCIA:
@@ -144,6 +164,40 @@ One limitation is that a small cohort (for example, 16 subjects) is insufficient
 ## Medical image analysis
 
 This is the area where the collection offers strong computational research opportunities.
+
+### CT imaging extension (added without removing the original package)
+
+The package now also supports a CT-specific AML imaging extension for same-patient longitudinal analysis. This is additive to the original framework and does not replace the earlier similarity or biomarker workflow.
+
+The CT extension is designed for data tables containing the following fields:
+
+- `patient_id`
+- `timepoint`
+- `lesion_volume_mm3`
+- `mean_intensity`
+- `treatment_response`
+
+Example workflow:
+
+```python
+import pandas as pd
+from aml_imaging_analysis.ct_imaging import summarize_ct_biomarker
+
+ct_df = pd.DataFrame(
+    {
+        "patient_id": ["P1", "P1", "P2", "P2"],
+        "timepoint": [0, 1, 0, 1],
+        "lesion_volume_mm3": [80.0, 45.0, 70.0, 78.0],
+        "mean_intensity": [120.0, 90.0, 100.0, 110.0],
+        "treatment_response": ["complete", "complete", "partial", "partial"],
+    }
+)
+
+summary = summarize_ct_biomarker(ct_df)
+print(summary)
+```
+
+This CT biomarker summarizes the mean change in lesion volume and signal intensity from baseline to follow-up across response groups, while preserving the same-patient design principle.
 
 ### A. Radiomics analysis (CT, MRI, and PET)
 
