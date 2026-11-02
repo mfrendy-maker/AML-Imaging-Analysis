@@ -69,6 +69,80 @@ This project is designed for patient-matched AML research using the CMB-AML coll
 - Correlation analysis between clinical variables and quantitative image features.
 - Unsupervised clustering and similarity matrix analysis to reveal patient subgroups.
 
+## Clinical data analysis
+
+Clinical data can support several investigations depending on the variables available in the associated clinical database.
+
+### Research domain
+
+Exploration of AML patient characteristics, treatment exposure, and clinical outcomes using patient-matched metadata.
+
+### Potential analyses
+
+- Patient demographics: age distribution, sex, demographic characteristics.
+- Disease characteristics: AML classification, diagnosis characteristics, disease status.
+- Treatment: treatment regimens, treatment history, therapeutic response.
+- Clinical outcomes: overall survival (OS), progression-free survival (PFS), event-free survival (EFS), if available.
+- Longitudinal analysis: changes in disease status and treatment response over time.
+- Risk stratification: identification of clinical factors associated with unfavorable outcomes.
+
+### Recommended statistical approaches
+
+- Descriptive statistics and patient characterization.
+- Kaplan–Meier survival analysis and log-rank tests.
+- Cox proportional hazards regression, if sample size and event counts permit.
+- Logistic regression for binary clinical outcomes.
+- Correlation analysis between clinical variables and quantitative image features.
+
+One limitation is that a small cohort (for example, 16 subjects) is insufficient for reliable multivariable prognostic modeling. These analyses are more appropriate as exploratory or descriptive studies.
+
+## Medical image analysis
+
+This is the area where the collection offers strong computational research opportunities.
+
+### A. Radiomics analysis (CT, MRI, and PET)
+
+Radiomics allows researchers to extract quantitative features from medical images.
+
+Potential features include:
+
+| Feature category | Parameters |
+| --- | --- |
+| First-order statistics | Mean, median, variance, skewness, kurtosis |
+| Shape features | Volume, surface area, sphericity |
+| Texture features | GLCM, GLRLM, GLSZM, GLDM |
+| Intensity features | Histogram distribution and signal intensity |
+| Spatial heterogeneity | Regional intensity and texture variation |
+
+Potential research questions:
+
+- Can imaging-derived features characterize disease heterogeneity in AML patients?
+- Are PET metabolic features associated with clinical disease status?
+- Can radiomic features identify imaging patterns associated with treatment response?
+- Can longitudinal imaging detect changes associated with disease progression?
+
+Tools:
+
+- 3D Slicer
+- PyRadiomics
+- ITK-SNAP
+- Python (SimpleITK, scikit-image)
+- MONAI
+
+### Brain PET imaging integration
+
+Brain PET analysis is particularly relevant for evaluating metabolic activity, heterogeneity, and functional patterns when PET imaging is available. In this setting, image-derived features can be used to summarize tracer uptake, regional intensity, and spatial distribution of abnormal activity. The same patient-matched strategy should be applied when linking PET-derived measurements with clinical information or longitudinal follow-up, so that only clinically matched patients are compared.
+
+Potential brain PET analyses include:
+
+- Regional metabolic uptake summary across brain structures.
+- Comparison of PET intensity patterns between responders and non-responders.
+- Longitudinal change in PET signal from baseline to follow-up.
+- Correlation between PET-derived quantitative measures and clinical disease status or treatment response.
+- Unsupervised clustering of PET features to identify metabolic subtypes.
+
+This imaging workflow complements the clinical analysis by adding a quantitative, image-based layer that may reveal disease patterns not captured by standard clinical variables alone.
+
 ### Output
 
 Downloaded metadata and derived results are stored under `data/` and can be used for patient comparison, cohort characterization, clustering, and outcome-oriented AML analysis. The repository currently supports patient-level metadata collection and similarity analysis based on shared patient identifiers and same-patient cohort logic, enabling more robust biological interpretation than mixing unrelated records.
