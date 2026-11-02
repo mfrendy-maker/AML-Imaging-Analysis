@@ -1,7 +1,7 @@
 {
   "collection": "CMB-AML",
-  "fetched_at_utc": "2026-11-02T04:02:06.405075+00:00",
-  "patient_count": 9,
+  "fetched_at_utc": "2026-11-02T04:30:04.993193+00:00",
+  "patient_count": 6,
   "patients": [
     {
       "patient_id": "MSB-01723",
@@ -24,26 +24,6 @@
         "CT": 3
       },
       "image_count": 30
-    },
-    {
-      "patient_id": "MSB-03755",
-      "study_count": 1,
-      "series_count": 3,
-      "modality": "CT",
-      "modalities": {
-        "CT": 3
-      },
-      "image_count": 43
-    },
-    {
-      "patient_id": "MSB-04591",
-      "study_count": 1,
-      "series_count": 3,
-      "modality": "CT",
-      "modalities": {
-        "CT": 3
-      },
-      "image_count": 39
     },
     {
       "patient_id": "MSB-05167",
@@ -77,16 +57,6 @@
       "image_count": 30
     },
     {
-      "patient_id": "MSB-07656",
-      "study_count": 1,
-      "series_count": 2,
-      "modality": "XA",
-      "modalities": {
-        "XA": 2
-      },
-      "image_count": 4
-    },
-    {
       "patient_id": "MSB-07839",
       "study_count": 3,
       "series_count": 8,
@@ -101,12 +71,9 @@
   "patient_ids": [
     "MSB-01723",
     "MSB-02960",
-    "MSB-03755",
-    "MSB-04591",
     "MSB-05167",
     "MSB-05702",
     "MSB-06711",
-    "MSB-07656",
     "MSB-07839"
   ]
 }
