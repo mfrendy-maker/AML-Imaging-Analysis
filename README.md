@@ -16,10 +16,17 @@ Acknowledgement:
 
 Users must also comply with the TCIA Data Usage Policy and Restrictions: https://www.cancerimagingarchive.net/data-usage-policies-and-restrictions/
 
+## Same-patient AML cohort design
+
+The correct AML-analysis design is patient-centric. Imaging, pathology, and clinical datasets should be aligned by the same patient identifiers and, when available, the same longitudinal visit or timepoint. This avoids mixing unrelated patients across data sources.
+
+The package includes a same-patient merge helper that intersects multiple patient-level tables and keeps only records shared by all provided data sources.
+
 ## Goals
 
 - Fetch collection metadata from the TCIA API and save it to the repository.
 - Build a patient-level similarity analysis for radiology and pathology metadata.
+- Enforce same-patient matching across imaging, pathology, and clinical sources.
 - Provide a CLI and reusable package APIs for pattern discovery.
 - Keep the project ready for GitHub-based collaboration and iterative analysis.
 
