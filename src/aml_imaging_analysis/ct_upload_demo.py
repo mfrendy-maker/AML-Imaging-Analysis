@@ -26,8 +26,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 HOST = '127.0.0.1'
 PORT = int(os.environ.get('PORT', '8003'))
 ROOT = Path(__file__).resolve().parents[2]
-UPLOAD_DIR = ROOT / 'data' / 'uploads'
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+TRAINING_UPLOAD_DIR = ROOT / 'data' / 'training_uploads'
 
 HTML_PAGE = """
 <!doctype html>
@@ -53,11 +52,13 @@ HTML_PAGE = """
 <body>
   <div class="container">
     <h1>AML CT Image Analysis</h1>
-    <p>Upload a CT image or CT-derived image file to estimate lesion burden and image intensity patterns for AML patient comparison.</p>
+    <p>Upload a CT image to view basic image-intensity statistics. This demo does not detect or locate tumors.</p>
     <div class="card">
       <form action="/analyse" method="post" enctype="multipart/form-data">
         <label for="image">CT scan image</label>
         <input id="image" name="image" type="file" accept=".png,.jpg,.jpeg,.dcm,.nii,.nii.gz,.tif,.tiff,image/png,image/jpeg,image/tiff" required>
+            <label><input name="training_consent" type="checkbox" value="yes"> Optional: I consent to this image being retained on the demo server for training use. I am authorized to share it and have removed identifying information.</label>
+            <p>Without consent, the image is processed for this result and is not saved. This demo does not remove identifying information or DICOM metadata.</p>
         <button type="submit">Analyse</button>
       </form>
     </div>
@@ -104,7 +105,7 @@ def _read_image_metrics(data: bytes) -> dict:
         'std_intensity': None,
         'max_intensity': None,
         'min_intensity': None,
-        'lesion_proxy_score': None,
+        'high_intensity_fraction': None,
         'notes': 'Image decoded successfully.'
     }
 
@@ -124,7 +125,7 @@ def _read_image_metrics(data: bytes) -> dict:
             metrics['max_intensity'] = float(np.max(arr))
             metrics['min_intensity'] = float(np.min(arr))
             threshold = float(np.percentile(arr, 75))
-            metrics['lesion_proxy_score'] = float(np.count_nonzero(arr >= threshold) / arr.size)
+            metrics['high_intensity_fraction'] = float(np.count_nonzero(arr >= threshold) / arr.size)
             return metrics
     except Exception as exc:
         metrics['notes'] = f'Image could not be decoded: {exc}'
@@ -133,7 +134,6 @@ def _read_image_metrics(data: bytes) -> dict:
 
 def render_result_page(result: dict) -> str:
     data = json.dumps(result, indent=2)
-    overlay_data = result.get('overlay_data_url', '')
     original_data = result.get('original_data_url', '')
     return f"""
 <!doctype html>
@@ -167,19 +167,19 @@ def render_result_page(result: dict) -> str:
         <div class="stat"><div class="label">Height</div><div>{result['height'] if result['height'] is not None else 'n/a'}</div></div>
         <div class="stat"><div class="label">Mean intensity</div><div>{result['mean_intensity'] if result['mean_intensity'] is not None else 'n/a'}</div></div>
         <div class="stat"><div class="label">Std intensity</div><div>{result['std_intensity'] if result['std_intensity'] is not None else 'n/a'}</div></div>
-        <div class="stat"><div class="label">Lesion proxy</div><div>{result['lesion_proxy_score'] if result['lesion_proxy_score'] is not None else 'n/a'}</div></div>
+            <div class="stat"><div class="label">High-intensity fraction</div><div>{result['high_intensity_fraction'] if result['high_intensity_fraction'] is not None else 'n/a'}</div></div>
       </div>
     </div>
     <div class="card">
-      <div class="label">Image with severity overlay</div>
+        <div class="label">CT preview</div>
       <div class="image-grid">
         <div class="image-box">
           <div class="label">Original CT</div>
           <img src="{original_data}" alt="Original CT" />
         </div>
         <div class="image-box">
-          <div class="label">Severity map</div>
-          <img src="{overlay_data}" alt="Heatmap overlay" />
+          <div class="label">Lesion localization</div>
+          <p>Not available. This demo does not use a validated tumor-segmentation model, so it cannot identify a cancer location.</p>
         </div>
       </div>
     </div>
@@ -188,6 +188,7 @@ def render_result_page(result: dict) -> str:
       <p>{html.escape(str(result['interpretation']))}</p>
       <p><strong>Biomarker:</strong> {html.escape(str(result['biomarker']))}</p>
       <p><strong>Clinical note:</strong> {html.escape(str(result['clinical_note']))}</p>
+            <p><strong>Training retention:</strong> {('Image saved for training because you opted in.' if result.get('training_retained', False) else 'Image not saved for training.')}</p>
     </div>
     <div class="card">
       <div class="label">Raw analysis</div>
@@ -200,83 +201,34 @@ def render_result_page(result: dict) -> str:
 """
 
 
-def _generate_severity_overlay(data: bytes) -> tuple[bytes, str, str]:
+def _image_preview_data_url(data: bytes) -> str:
     if Image is None or np is None:
-        return b'', '', ''
+        return ''
 
     try:
         with Image.open(io.BytesIO(data)) as img:
-            image = img.convert('L')
-            arr = np.asarray(image, dtype=np.float32)
-            if arr.size == 0:
-                return b'', '', ''
-
-            # Demo-only: simple intensity-based suspicious-region heuristic.
-            p90 = float(np.percentile(arr, 90))
-            p95 = float(np.percentile(arr, 95))
-            threshold = max(p90, p95)
-            mask = arr >= threshold
-
-            if not np.any(mask):
-                mask = arr >= np.percentile(arr, 85)
-
-            mask = mask.astype(np.uint8)
-            if np.any(mask):
-                mask = mask.astype(bool)
-            else:
-                mask = (arr >= np.percentile(arr, 98)).astype(bool)
-
-            overlay = Image.new('RGBA', image.size, (0, 0, 0, 0))
-            pixels = overlay.load()
-            for y in range(image.height):
-                for x in range(image.width):
-                    if mask[y, x]:
-                        pixels[x, y] = (255, 60, 60, 170)
-
-            outline = Image.new('RGBA', image.size, (0, 0, 0, 0))
-            outline_px = outline.load()
-            for y in range(1, image.height - 1):
-                for x in range(1, image.width - 1):
-                    if mask[y, x] and (
-                        not mask[y - 1, x] or not mask[y + 1, x] or
-                        not mask[y, x - 1] or not mask[y, x + 1]
-                    ):
-                        outline_px[x, y] = (255, 255, 255, 200)
-
-            base = image.convert('RGBA')
-            composite = Image.alpha_composite(base, overlay)
-            composite = Image.alpha_composite(composite, outline)
-
             buf = io.BytesIO()
-            composite.save(buf, format='PNG')
-            overlay_bytes = buf.getvalue()
-            original_b64 = base64.b64encode(data).decode('ascii')
-            overlay_b64 = base64.b64encode(overlay_bytes).decode('ascii')
-            return overlay_bytes, f'data:image/png;base64,{original_b64}', f'data:image/png;base64,{overlay_b64}'
+            img.convert('L').save(buf, format='PNG')
+            preview_b64 = base64.b64encode(buf.getvalue()).decode('ascii')
+            return f'data:image/png;base64,{preview_b64}'
     except Exception:
-        return b'', '', ''
+        return ''
 
 
-def analyse_uploaded_file(file_name: str, data: bytes) -> dict:
+def analyse_uploaded_file(file_name: str, data: bytes, training_retained: bool = False) -> dict:
     metrics = _read_image_metrics(data)
     mean_i = metrics['mean_intensity']
     std_i = metrics['std_intensity']
-    lesion_proxy = metrics['lesion_proxy_score']
-    overlay_bytes, original_data_url, overlay_data_url = _generate_severity_overlay(data)
+    original_data_url = _image_preview_data_url(data)
 
     if mean_i is None:
         interpretation = 'The uploaded file was not readable as an image, so only file metadata could be assessed.'
         biomarker = 'Image decoding unavailable'
         clinical_note = 'Please upload a standard CT image or an image preview of the scan.'
     else:
-        interpretation = 'Demo-only intensity heuristic: this is not a clinical diagnosis or validated lesion segmentation.'
-        biomarker = 'CT intensity proxy for suspicious regions'
-        clinical_note = 'The red highlight marks the highest-intensity pixels in the uploaded image; it is a visualization aid for demo testing, not a medical interpretation.'
-
-        if lesion_proxy is not None and lesion_proxy > 0.25:
-            interpretation = 'Demo-only intensity heuristic: the image shows a stronger high-intensity focus, but this is not a clinical diagnosis or validated lesion segmentation.'
-        elif mean_i > 150:
-            interpretation = 'Demo-only intensity heuristic: the image has relatively high signal intensity, but this is not a validated AML lesion measurement.'
+        interpretation = 'Image intensity statistics only. This demo does not detect or locate tumors and must not be used for diagnosis.'
+        biomarker = 'Image intensity summary (not a tumor biomarker)'
+        clinical_note = 'No lesion segmentation was performed. Bright areas may represent normal anatomy, contrast, bone, calcification, or acquisition settings.'
 
     summary = {
         'file_name': file_name,
@@ -286,17 +238,27 @@ def analyse_uploaded_file(file_name: str, data: bytes) -> dict:
         'std_intensity': std_i,
         'max_intensity': metrics['max_intensity'],
         'min_intensity': metrics['min_intensity'],
-        'lesion_proxy_score': lesion_proxy,
+        'high_intensity_fraction': metrics['high_intensity_fraction'],
         'interpretation': interpretation,
         'biomarker': biomarker,
         'clinical_note': clinical_note,
         'source': 'AML CT upload demo',
-        'analysis_type': 'same-patient CT imaging proxy',
+        'analysis_type': 'CT image intensity summary; no lesion segmentation',
         'timestamp_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
-        'overlay_data_url': overlay_data_url,
+        'training_retained': training_retained,
         'original_data_url': original_data_url,
     }
     return summary
+
+
+def _store_training_upload(file_name: str, data: bytes, form: dict) -> bool:
+    if form.get('training_consent') != 'yes':
+        return False
+
+    TRAINING_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    destination = TRAINING_UPLOAD_DIR / f'{int(time.time() * 1000)}_{file_name}'
+    destination.write_bytes(data)
+    return True
 
 
 class AMLCTUploadHandler(BaseHTTPRequestHandler):
@@ -349,16 +311,14 @@ class AMLCTUploadHandler(BaseHTTPRequestHandler):
             payload = uploaded.encode('utf-8') if isinstance(uploaded, str) else b''
 
         filename = _safe_name(filename)
-        result = analyse_uploaded_file(filename, payload)
+        training_retained = _store_training_upload(filename, payload, form)
+        result = analyse_uploaded_file(filename, payload, training_retained=training_retained)
         output = render_result_page(result).encode('utf-8')
         self.send_response(200)
         self.send_header('Content-Type', 'text/html; charset=utf-8')
         self.send_header('Content-Length', str(len(output)))
         self.end_headers()
         self.wfile.write(output)
-
-        destination = UPLOAD_DIR / f'{int(time.time() * 1000)}_{filename}'
-        destination.write_bytes(payload)
 
     def log_message(self, *args, **kwargs):
         return

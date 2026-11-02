@@ -52,12 +52,13 @@ Then open the browser at:
 
 - http://127.0.0.1:8003/upload
 
-The page accepts a CT file from the local machine and returns a result page showing:
+The page accepts a CT image and returns a result page showing:
 
 - the original CT image
-- a red intensity-based suspicious overlay
-- summary statistics such as mean intensity, standard deviation, and lesion proxy score
-- a short interpretation note stating that this is a demo-only image heuristic
+- basic image-intensity statistics, not a tumor biomarker
+- a notice that tumor localization is unavailable because the demo has no validated segmentation model
+
+Image retention for training is optional and requires an unchecked-by-default consent checkbox. Without consent, the uploaded image is not saved by the demo. Consented uploads are stored under `data/training_uploads/`, which is ignored by Git. Only opt in if you are authorized to share the image and have removed identifying information; this demo does not de-identify images or DICOM metadata. Existing files already tracked under `data/uploads/` are not removed from Git by the ignore rule and must be audited separately.
 
 ## Collection
 

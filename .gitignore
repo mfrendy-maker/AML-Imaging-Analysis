@@ -2,9 +2,13 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+.venv-tcia/
 venv/
 .DS_Store
 *.egg-info/
+data/uploads/
+data/training_uploads/
+data/tcia_downloads/
 .mypy_cache/
 .coverage
 htmlcov/
