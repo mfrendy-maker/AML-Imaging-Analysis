@@ -1,0 +1,112 @@
+{
+  "collection": "CMB-AML",
+  "fetched_at_utc": "2026-11-02T02:57:30.251523+00:00",
+  "patient_count": 9,
+  "patients": [
+    {
+      "patient_id": "MSB-01723",
+      "study_count": 5,
+      "series_count": 15,
+      "modality": "CT",
+      "modalities": {
+        "CT": 8,
+        "MR": 3,
+        "XA": 4
+      },
+      "image_count": 687
+    },
+    {
+      "patient_id": "MSB-02960",
+      "study_count": 1,
+      "series_count": 3,
+      "modality": "CT",
+      "modalities": {
+        "CT": 3
+      },
+      "image_count": 30
+    },
+    {
+      "patient_id": "MSB-03755",
+      "study_count": 1,
+      "series_count": 3,
+      "modality": "CT",
+      "modalities": {
+        "CT": 3
+      },
+      "image_count": 43
+    },
+    {
+      "patient_id": "MSB-04591",
+      "study_count": 1,
+      "series_count": 3,
+      "modality": "CT",
+      "modalities": {
+        "CT": 3
+      },
+      "image_count": 39
+    },
+    {
+      "patient_id": "MSB-05167",
+      "study_count": 1,
+      "series_count": 11,
+      "modality": "CT",
+      "modalities": {
+        "CT": 11
+      },
+      "image_count": 1532
+    },
+    {
+      "patient_id": "MSB-05702",
+      "study_count": 2,
+      "series_count": 4,
+      "modality": "CT",
+      "modalities": {
+        "CT": 3,
+        "XA": 1
+      },
+      "image_count": 30
+    },
+    {
+      "patient_id": "MSB-06711",
+      "study_count": 1,
+      "series_count": 3,
+      "modality": "CT",
+      "modalities": {
+        "CT": 3
+      },
+      "image_count": 30
+    },
+    {
+      "patient_id": "MSB-07656",
+      "study_count": 1,
+      "series_count": 2,
+      "modality": "XA",
+      "modalities": {
+        "XA": 2
+      },
+      "image_count": 4
+    },
+    {
+      "patient_id": "MSB-07839",
+      "study_count": 3,
+      "series_count": 8,
+      "modality": "CT",
+      "modalities": {
+        "CT": 6,
+        "XA": 2
+      },
+      "image_count": 473
+    }
+  ],
+  "patient_ids": [
+    "MSB-01723",
+    "MSB-02960",
+    "MSB-03755",
+    "MSB-04591",
+    "MSB-05167",
+    "MSB-05702",
+    "MSB-06711",
+    "MSB-07656",
+    "MSB-07839"
+  ]
+}
