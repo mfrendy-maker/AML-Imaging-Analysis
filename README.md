@@ -69,6 +69,51 @@ This project is designed for patient-matched AML research using the CMB-AML coll
 - Correlation analysis between clinical variables and quantitative image features.
 - Unsupervised clustering and similarity matrix analysis to reveal patient subgroups.
 
+## Study design workflow
+
+The following pipeline summarizes the AML patient-matched analysis strategy used in this project.
+
+```text
++---------------------------+
+| 1. Data acquisition       |
+| TCIA CMB-AML collection   |
+| same-patient cohort only  |
++-------------+-------------+
+              |
+              v
++---------------------------+
+| 2. Clinical profiling     |
+| demographics, disease,    |
+| treatment, outcomes        |
++-------------+-------------+
+              |
+              v
++---------------------------+
+| 3. Imaging analysis       |
+| CT / MRI / PET features   |
+| radiomics and PET metrics |
++-------------+-------------+
+              |
+              v
++---------------------------+
+| 4. Longitudinal tracking   |
+| baseline vs follow-up     |
+| disease progression       |
++-------------+-------------+
+              |
+              v
++---------------------------+
+| 5. Similarity & clustering|
+| patient patterns and subgroups |
++-------------+-------------+
+              |
+              v
++---------------------------+
+| 6. Biological interpretation |
+| outcome-linked AML patterns |
++---------------------------+
+```
+
 ## Clinical data analysis
 
 Clinical data can support several investigations depending on the variables available in the associated clinical database.
