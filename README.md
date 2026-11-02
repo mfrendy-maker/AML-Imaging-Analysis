@@ -1,6 +1,8 @@
 # AML Imaging Analysis
 
-This repository contains a Python package for retrieving and analyzing the public `CMB-AML` imaging collection from the Cancer Imaging Archive (TCIA) and for revealing similarity patterns across AML patients.
+A patient-matched AML imaging analysis toolkit for studying imaging patterns, longitudinal change, and outcome-linked biology in the CMB-AML collection.
+
+This repository contains a Python package developed by Muhamad Frendy for retrieving and analyzing the public `CMB-AML` imaging collection from the Cancer Imaging Archive (TCIA) and for revealing similarity patterns across AML patients.
 
 ## Data citation and usage policy
 
@@ -43,6 +45,30 @@ The project currently targets the public Cancer Moonshot Biobank – Acute Myelo
 
 - https://www.cancerimagingarchive.net/collection/cmb-aml/
 
-## Output
+## Research domain and planned analyses
 
-Downloaded metadata is stored under `data/` and can be used for patient comparison and clustering.
+This project is designed for patient-matched AML research using the CMB-AML collection from TCIA. The goal is to integrate imaging metadata with clinical context to identify patterns that may distinguish patient subgroups, treatment responses, and disease trajectories.
+
+### Potential analyses
+
+- Patient demographics: age distribution, sex distribution, demographic characteristics, and baseline cohort composition.
+- Disease characteristics: AML classification, diagnosis characteristics, disease status at baseline, and disease complexity.
+- Treatment: treatment regimens, treatment history, therapeutic exposure, and treatment response patterns.
+- Clinical outcomes: overall survival (OS), progression-free survival (PFS), event-free survival (EFS), and other clinically relevant outcome endpoints when available.
+- Longitudinal analysis: change in disease state, treatment response, and imaging-related patterns over time across visits or follow-up timepoints.
+- Risk stratification: identification of clinical and imaging-related factors associated with unfavorable outcomes or high-risk disease behavior.
+- Imaging-clinical integration: correlation between clinical variables and quantitative image-derived or metadata-based similarity patterns.
+- Patient similarity and clustering: identification of similar AML patients based on shared metadata, disease patterns, and longitudinal trajectories.
+
+### Recommended statistical approaches
+
+- Descriptive statistics and patient characterization.
+- Kaplan–Meier survival analysis and log-rank tests.
+- Cox proportional hazards regression, if sample size and event counts permit.
+- Logistic regression for binary clinical outcomes.
+- Correlation analysis between clinical variables and quantitative image features.
+- Unsupervised clustering and similarity matrix analysis to reveal patient subgroups.
+
+### Output
+
+Downloaded metadata and derived results are stored under `data/` and can be used for patient comparison, cohort characterization, clustering, and outcome-oriented AML analysis. The repository currently supports patient-level metadata collection and similarity analysis based on shared patient identifiers and same-patient cohort logic, enabling more robust biological interpretation than mixing unrelated records.

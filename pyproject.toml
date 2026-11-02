@@ -5,7 +5,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "aml-imaging-analysis"
 version = "0.1.0"
-description = "AML imaging analysis package for TCIA CMB-AML similarity and pattern detection. Data citation: Cancer Moonshot Biobank. (2023). Cancer Moonshot Biobank – Acute Myeloid Leukemia (CMB-AML) (Version 9) [dataset]. The Cancer Imaging Archive. https://doi.org/10.7937/pcte-6m66"
+description = "Patient-matched AML imaging analysis for CMB-AML similarity, clustering, longitudinal change, and outcome-linked biology."
+authors = [{name = "Muhamad Frendy"}]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
